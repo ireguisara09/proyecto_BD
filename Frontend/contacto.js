@@ -1,5 +1,5 @@
 
-const API_URL = "https://proyecto-bd-j2qx.onrender.com";
+const API_URL = "https://proyecto-bd-j2qx.onrender.com/mensajes_contacto";
 
 const listaMensajes = document.getElementById("listaMensajes");
 const formulario = document.getElementById("formularioMensaje");
