@@ -1,5 +1,5 @@
 // Debe coincidir EXACTAMENTE con la ruta definida en tu backend (server.js)
-const API_URL = "http://localhost:3000/mensajes_contacto";
+const API_URL = "https://proyecto-bd-j2qx.onrender.com";
 
 const listaMensajes = document.getElementById("listaMensajes");
 const formulario = document.getElementById("formularioMensaje");
