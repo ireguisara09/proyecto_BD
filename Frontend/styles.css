@@ -310,25 +310,23 @@ textarea:focus {
     .nav-links {
         flex-wrap: wrap;
         justify-content: flex-end;
-        gap: 8px 14px;
-        font-size: 0.9rem;
+        gap: 10px 14px;
     }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 560px) {
     .nav-contenido {
         height: auto;
         min-height: 65px;
-        padding-top: 10px;
-        padding-bottom: 10px;
         flex-direction: column;
+        justify-content: center;
         gap: 8px;
+        padding-top: 12px;
+        padding-bottom: 12px;
     }
 
     .nav-links {
-        width: 100%;
-        justify-content: space-between;
-        gap: 8px;
-        font-size: 0.82rem;
+        justify-content: center;
+        gap: 8px 16px;
     }
 }
