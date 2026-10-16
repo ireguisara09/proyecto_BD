@@ -1,4 +1,4 @@
-// Debe coincidir EXACTAMENTE con la ruta definida en tu backend (server.js)
+
 const API_URL = "https://proyecto-bd-j2qx.onrender.com";
 
 const listaMensajes = document.getElementById("listaMensajes");
@@ -12,20 +12,44 @@ const btnGuardar = document.getElementById("btnGuardar");
 const btnCancelar = document.getElementById("btnCancelar");
 const tituloFormulario = document.getElementById("tituloFormulario");
 
+async function procesarRespuesta(respuesta) {
+  const texto = await respuesta.text();
+
+  let resultado;
+
+  try {
+    resultado = JSON.parse(texto);
+  } catch {
+    console.error("Respuesta recibida del servidor:", texto);
+    throw new Error(
+      "El servidor devolvió HTML o una respuesta no válida. Verifica la URL y las rutas de la API."
+    );
+  }
+
+  if (!respuesta.ok) {
+    throw new Error(
+      resultado.mensaje ||
+      resultado.error ||
+      `Error HTTP: ${respuesta.status}`
+    );
+  }
+
+  return resultado;
+}
+
 async function cargarMensajes() {
   if (!listaMensajes) return;
 
   try {
-    // GET http://localhost:3000/mensajes_contacto
-    const respuesta = await fetch(API_URL);
-
-    if (!respuesta.ok) {
-      throw new Error(`Error HTTP: ${respuesta.status}`);
-    }
-
-    const mensajes = await respuesta.json();
+    const mensajes = await procesarRespuesta(
+      await fetch(API_URL)
+    );
 
     listaMensajes.innerHTML = "";
+
+    if (!Array.isArray(mensajes)) {
+      throw new Error("La API no devolvió una lista de mensajes.");
+    }
 
     if (mensajes.length === 0) {
       listaMensajes.innerHTML =
@@ -83,6 +107,7 @@ async function cargarMensajes() {
     });
   } catch (error) {
     console.error("Error al cargar mensajes:", error);
+
     listaMensajes.innerHTML =
       "<p>No se pudieron cargar los mensajes. Revisa el servidor y la ruta de la API.</p>";
   }
@@ -141,30 +166,18 @@ if (formulario) {
     const datos = { nombre, email, asunto, mensaje };
 
     try {
-      const respuesta = await fetch(id ? `${API_URL}/${id}` : API_URL, {
-        method: id ? "PUT" : "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(datos)
-      });
+      const respuesta = await fetch(
+        id ? `${API_URL}/${id}` : API_URL,
+        {
+          method: id ? "PUT" : "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(datos)
+        }
+      );
 
-      const textoRespuesta = await respuesta.text();
-      let resultado;
-
-      try {
-        resultado = JSON.parse(textoRespuesta);
-      } catch {
-        throw new Error(
-          "El servidor devolvió HTML en lugar de JSON. Verifica la URL y la configuración de la API."
-        );
-      }
-
-      if (!respuesta.ok) {
-        throw new Error(
-          resultado.mensaje || resultado.error || `Error HTTP: ${respuesta.status}`
-        );
-      }
+      const resultado = await procesarRespuesta(respuesta);
 
       alert(resultado.mensaje || "Mensaje guardado correctamente.");
 
@@ -185,14 +198,11 @@ async function eliminarMensaje(id) {
   if (!confirmar) return;
 
   try {
-    // DELETE -> http://localhost:3000/mensajes_contacto/:id
     const respuesta = await fetch(`${API_URL}/${id}`, {
       method: "DELETE"
     });
 
-    if (!respuesta.ok) {
-      throw new Error(`Error HTTP: ${respuesta.status}`);
-    }
+    await procesarRespuesta(respuesta);
 
     if (mensajeId.value == id) {
       cancelarEdicion();
