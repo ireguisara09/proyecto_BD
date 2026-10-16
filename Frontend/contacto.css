@@ -223,8 +223,8 @@ textarea:focus {
 }
 
 .lista-mensajes {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+    display: flex;
+    flex-direction: column;
     gap: 15px;
 }
 
@@ -234,16 +234,19 @@ textarea:focus {
     background-color: #f8fafc;
     border: 1px solid #e2e8f0;
     border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 12px;
     overflow-wrap: anywhere;
 }
 
 .mensajes_contacto h3 {
-    margin-bottom: 10px;
+    font-size: 1.05rem;
     color: #0f172a;
 }
 
 .mensajes_contacto p {
-    margin-bottom: 6px;
     color: #64748b;
     font-size: 0.9rem;
 }
@@ -269,9 +272,9 @@ textarea:focus {
     color: #64748b;
 }
 
-.mensaje-asunto {
+.mensajes_contacto .mensaje-asunto {
     font-weight: 700;
-    color: #2563eb;
+    color: #8b62ac;
     font-size: 1.1rem !important;
 }
 
@@ -302,7 +305,7 @@ textarea:focus {
 
 .btn-eliminar {
     background-color: #fee2e2;
-    color: #dc2626;
+    color: #f31717;
 }
 
 .btn-eliminar:hover {
