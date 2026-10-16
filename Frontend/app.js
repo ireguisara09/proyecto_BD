@@ -1,5 +1,5 @@
 
-const API_URL = "http://localhost:3000";
+const API_URL = "https://proyecto-bd-j2qx.onrender.com";
 
 // Elementos del DOM
 const listaProductos = document.getElementById("listaProductos");
