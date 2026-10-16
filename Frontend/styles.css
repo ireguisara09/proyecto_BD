@@ -308,6 +308,27 @@ textarea:focus {
     }
 
     .nav-links {
-        display: none;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 8px 14px;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .nav-contenido {
+        height: auto;
+        min-height: 65px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .nav-links {
+        width: 100%;
+        justify-content: space-between;
+        gap: 8px;
+        font-size: 0.82rem;
     }
 }
