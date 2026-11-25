@@ -11,21 +11,23 @@
   <!-- Fuente moderna -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap";
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
     rel="stylesheet" />
 
   <link rel="stylesheet" href="contacto.css" />
+  <link rel="stylesheet" href="navbar.css" />
 </head>
 
 <body>
   <!-- ===== BARRA DE NAVEGACIÓN (NAVBAR) ===== -->
-  <header class="navbar">
-    <div class="contenedor nav-contenido">
-      <a href="index.html" class="logo"> Mi<strong>Tienda</strong></a>
+  <header class="nav">
+    <div class="wrap nav-in">
+      <a href="index.html" class="logo">Mi<strong>Tienda</strong></a>
       <nav class="nav-links">
         <a href="index.html">Inicio</a>
-        <a href="index.html">Productos</a>
-        <a href="contacto.html">Contacto</a>
+        <a href="index.html#destacados">Destacados</a>
+        <a href="productos.html">Productos</a>
+        <a href="contacto.html" class="btn-nav">Contacto</a>
       </nav>
     </div>
   </header>
@@ -90,7 +92,7 @@
   <!-- ===== PIE DE PÁGINA (FOOTER) ===== -->
   <footer class="footer">
     <div class="contenedor footer-contenido">
-      <p>&copy 2026 Mi Tienda — Proyecto Formativo con Node.js, Express y MySQL.</p>
+      <p>&copy; 2026 Mi Tienda — Proyecto Formativo con Node.js, Express y MySQL.</p>
     </div>
   </footer>
 

@@ -1,91 +1,151 @@
-
-
 <!doctype html>
 <html lang="es">
 
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mi Tienda — Gestión de Productos</title>
+  <title>Mi Tienda — Inicio</title>
+  <meta name="description" content="Mi Tienda: catálogo en línea con inventario siempre actualizado." />
 
-  <!-- Fuente moderna -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap";
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet" />
-
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="navbar.css" />
+  <link rel="stylesheet" href="inicio.css" />
 </head>
 
 <body>
-  <!-- ===== BARRA DE NAVEGACIÓN (NAVBAR) ===== -->
-  <header class="navbar">
-    <div class="contenedor nav-contenido">
-      <a href="index.html" class="logo"> Mi<strong>Tienda</strong></a>
+  <!-- ===== NAVBAR ===== -->
+  <header class="nav">
+    <div class="wrap nav-in">
+      <a href="index.html" class="logo">Mi<strong>Tienda</strong></a>
       <nav class="nav-links">
-        <a href="index.html">Inicio</a>
-        <a href="#productos">Productos</a>
-        <a href="contacto.html">Contacto</a>
+        <a href="index.html" class="activo">Inicio</a>
+        <a href="#destacados">Destacados</a>
+        <a href="productos.html">Productos</a>
+        <a href="contacto.html" class="btn-nav">Contacto</a>
       </nav>
     </div>
   </header>
 
-  <!-- ===== CONTENIDO PRINCIPAL ===== -->
-  <main class="contenedor" id="inicio">
-    <div class="encabezado-principal">
-      <h1>Sistema de Gestión de Productos</h1>
-      <p>Panel de control conectado a MySQL y Express</p>
-    </div>
-
-    <div class="panel-tienda">
-      <!-- SECCIÓN 1: Formulario de Registro -->
-      <section class="tarjeta" id="registro">
-        <h2 id="tituloFormulario">Registrar Producto</h2>
-
-        <form id="formularioProducto">
-          <!-- Campo oculto para almacenar el ID en caso de edición -->
-          <input type="hidden" id="productoId" value="" />
-
-          <div class="campo">
-            <label for="nombre">Nombre del producto:</label>
-            <input type="text" id="nombre" placeholder="Ej: Camiseta básica" required />
-          </div>
-
-          <div class="campo">
-            <label for="precio">Precio ($):</label>
-            <input type="number" id="precio" step="0.01" placeholder="Ej: 25000" required />
-          </div>
-
-          <div class="campo">
-            <label for="stock">Stock (cantidad):</label>
-            <input type="number" id="stock" placeholder="Ej: 10" required />
-          </div>
-
-          <div class="acciones-form">
-            <button type="submit" id="btnGuardar" class="btn btn-guardar">Guardar Producto</button>
-            <button type="button" id="btnCancelar" class="btn btn-cancelar" style="display: none;">Cancelar</button>
-          </div>
-        </form>
-      </section>
-
-      <!-- SECCIÓN 2: Lista de Productos -->
-      <section class="tarjeta" id="productos">
-        <h2>Lista de Productos</h2>
-        <div id="listaProductos" class="lista-productos">
-          <!-- Los productos se cargan desde app.js -->
+  <!-- ===== HERO ===== -->
+  <section class="hero">
+    <div class="wrap hero-in">
+      <div class="hero-texto">
+        <span class="chip">Catálogo en línea</span>
+        <h1>Todo lo que buscas, <span class="grad">en un solo lugar</span></h1>
+        <p>Descubre nuestros productos con precios claros e inventario siempre actualizado. Simple, rápido y pensado para ti.</p>
+        <div class="hero-btns">
+          <a href="#destacados" class="btn btn-rosa">Ver productos</a>
+          <a href="contacto.html" class="btn btn-borde">Escríbenos</a>
         </div>
-      </section>
-    </div>
-  </main>
+        <ul class="stats">
+          <li><strong id="statProductos">—</strong><span>productos</span></li>
+          <li><strong id="statUnidades">—</strong><span>unidades en stock</span></li>
+          <li><strong>24/7</strong><span>catálogo disponible</span></li>
+        </ul>
+      </div>
 
-  <!-- ===== PIE DE PÁGINA (FOOTER) ===== -->
+      <div class="hero-visual" aria-hidden="true">
+        <div class="blob"></div>
+        <svg class="bolsa" viewBox="0 0 120 120" fill="none">
+          <path d="M28 40h64l6 62a6 6 0 0 1-6 6H28a6 6 0 0 1-6-6l6-62Z" fill="#fff" />
+          <path d="M44 48V36a16 16 0 0 1 32 0v12" stroke="#fff" stroke-width="7" stroke-linecap="round" />
+          <circle cx="46" cy="62" r="5" fill="#eb256a" />
+          <circle cx="74" cy="62" r="5" fill="#eb256a" />
+        </svg>
+        <div class="flota f1"><span>✨</span> Productos nuevos</div>
+        <div class="flota f2"><span>📦</span> Stock al día</div>
+        <div class="flota f3"><span>💖</span> Atención cercana</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== BENEFICIOS ===== -->
+  <section class="seccion">
+    <div class="wrap">
+      <div class="titulo reveal">
+        <span class="chip chip-suave">Por qué elegirnos</span>
+        <h2>Comprar debería ser fácil</h2>
+      </div>
+      <div class="grid4">
+        <article class="beneficio reveal">
+          <div class="icono">🛍️</div>
+          <h3>Catálogo claro</h3>
+          <p>Cada producto con su precio y disponibilidad a la vista.</p>
+        </article>
+        <article class="beneficio reveal">
+          <div class="icono">⚡</div>
+          <h3>Información en vivo</h3>
+          <p>Los datos vienen directo de nuestra base de datos, sin desfases.</p>
+        </article>
+        <article class="beneficio reveal">
+          <div class="icono">🔒</div>
+          <h3>Confiable</h3>
+          <p>Un sistema estable construido con Node.js, Express y MySQL.</p>
+        </article>
+        <article class="beneficio reveal">
+          <div class="icono">💬</div>
+          <h3>Habla con nosotros</h3>
+          <p>¿Dudas o sugerencias? Déjanos un mensaje y te leemos.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== DESTACADOS (se llena desde la API) ===== -->
+  <section class="seccion seccion-suave" id="destacados">
+    <div class="wrap">
+      <div class="titulo reveal">
+        <span class="chip chip-suave">Lo más reciente</span>
+        <h2>Productos destacados</h2>
+      </div>
+      <p id="estadoCarga" class="estado" hidden>Despertando el servidor, un momento…</p>
+      <div id="destacadosGrid" class="grid4">
+        <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
+      </div>
+      <div class="centro reveal">
+        <a href="productos.html" class="btn btn-rosa">Ver todos los productos</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CÓMO FUNCIONA ===== -->
+  <section class="seccion">
+    <div class="wrap">
+      <div class="titulo reveal">
+        <span class="chip chip-suave">Así de simple</span>
+        <h2>Tres pasos y listo</h2>
+      </div>
+      <div class="pasos">
+        <div class="paso reveal"><b>1</b><h3>Explora</h3><p>Revisa el catálogo y encuentra lo que necesitas.</p></div>
+        <div class="paso reveal"><b>2</b><h3>Elige</h3><p>Consulta precio y unidades disponibles al instante.</p></div>
+        <div class="paso reveal"><b>3</b><h3>Contáctanos</h3><p>Escríbenos y te ayudamos a completar tu pedido.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CTA ===== -->
+  <section class="wrap">
+    <div class="cta reveal">
+      <h2>¿Listo para empezar?</h2>
+      <p>Explora el catálogo o cuéntanos qué estás buscando.</p>
+      <div class="hero-btns centro-btns">
+        <a href="productos.html" class="btn btn-blanco">Ir a productos</a>
+        <a href="contacto.html" class="btn btn-contorno">Contacto</a>
+      </div>
+    </div>
+  </section>
+
+   <!-- ===== PIE DE PÁGINA (FOOTER) ===== -->
   <footer class="footer">
     <div class="contenedor footer-contenido">
-      <p>&copy 2026 Mi Tienda — Proyecto Formativo con Node.js, Express y MySQL.</p>
+      <p>&copy; 2026 Mi Tienda — Proyecto Formativo con Node.js, Express y MySQL.</p>
     </div>
   </footer>
 
-  <script src="app.js"></script>
+  <script src="inicio.js"></script>
 </body>
 
 </html>
