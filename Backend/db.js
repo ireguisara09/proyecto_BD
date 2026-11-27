@@ -1,16 +1,16 @@
+
 require("dotenv").config();
-const mysql = require('mysql2'); 
+const mysql = require("mysql2");
 
-// Configuracion de la conexion de la BD
+// Configuración de la conexión a la base de datos
 
+const host = process.env.DB_HOST || "localhost";
+const port = Number(process.env.DB_PORT) || 3306;
+const user = process.env.DB_USER || "root";
+const password = process.env.DB_PASSWORD || "";
+const database = process.env.DB_NAME || "tienda";
 
-    const host = process.env.DB_HOST || "localhost";   
-    const port = Number(process.env.DB_PRT) || 3306; 
-    const user = process.env.DB_USER || "root";
-    const password = process.env.DB_PASSWORD || "";
-    const database = process.env.DB_NAME || "tienda"
-
-// Opciones de configuracion 
+// Opciones de configuración
 
 const configuracion = {
     host,
@@ -18,31 +18,40 @@ const configuracion = {
     user,
     password,
     database,
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
 };
 
-// Si el host es remoto (TiDB Cloud), habilitar el SSL automaticamente
-if (host !== "localhost" && host !== "127.0.0.10") {
+// Si el host es remoto (TiDB Cloud), habilitar SSL
+if (host !== "localhost" && host !== "127.0.0.1") {
     configuracion.ssl = {
         minVersion: "TLSv1.2",
         rejectUnauthorized: true
     };
 }
 
-// Crear la conexión con MySQL o TiDB Cloud
+// Crear un pool de conexiones MySQL
+const conexion = mysql.createPool(configuracion);
 
-const conexion = mysql.createConnection(configuracion)
+// Verificar la conexión a la base de datos
+conexion.getConnection((error, connection) => {
 
-// Comprobamos si la conexion fue exitosa 
-
-conexion.connect((error) => {
     if (error) {
-        console.error("Error al conectar con la Base de Datos", error.message);
-        return; 
+        console.error(
+            "Error al conectar con la Base de Datos:",
+            error.message
+        );
+        return;
     }
-    console.log(`Conexión exitosa con la Base de Dtos (${host}:${port})`);
+
+    console.log(
+        `Conexión exitosa con la Base de Datos (${host}:${port})`
+    );
+
+    // Liberar la conexión para que pueda reutilizarse
+    connection.release();
 });
 
-
-// Es obligatorio exportar la conexion para reutilizarla en la srutas del servidor
-
+// Exportar el pool para utilizarlo en las rutas del servidor
 module.exports = conexion;

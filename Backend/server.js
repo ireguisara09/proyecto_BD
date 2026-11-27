@@ -1,14 +1,56 @@
+
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const conexion = require("./db");
+const { subirImgenCloudinary } = require("./cloudinary");
 
 const app = express();
-const PUERTO = 3000;
 
 // Middlewares
 app.use(cors());
-app.use(express.json());
+
+// Limite de 10 MB para el envio de imagenes en Base64 hacia Cloudinary
+app.use(express.json({ limit: "10mb" }));
+
+// Verificar que la tabla producto tenga la columna imagen_url
+function verificarColumnaImagen() {
+    return new Promise((resolve, reject) => {
+
+        conexion.query(
+            "SHOW COLUMNS FROM producto LIKE 'imagen_url'",
+            (err, resultados) => {
+
+                if (err) {
+                    console.error("Error al verificar la columna imagen_url:", err);
+                    return reject(err);
+                }
+
+                // Si la columna no existe, la creamos
+                if (resultados.length === 0) {
+
+                    conexion.query(
+                        "ALTER TABLE producto ADD COLUMN imagen_url VARCHAR(500) DEFAULT NULL",
+                        (errAlter) => {
+
+                            if (errAlter) {
+                                console.error("Error al crear la columna imagen_url:", errAlter);
+                                return reject(errAlter);
+                            }
+
+                            console.log("Columna imagen_url agregada correctamente a producto");
+                            resolve();
+                        }
+                    );
+
+                } else {
+                    console.log("La columna imagen_url ya existe en producto");
+                    resolve();
+                }
+            }
+        );
+    });
+}
 
 // GET: Obtener todos los productos
 app.get("/producto", (req, res) => {
@@ -27,74 +69,106 @@ app.get("/producto", (req, res) => {
 });
 
 // POST: Registrar un producto
-app.post("/producto", (req, res) => {
-    const { nombre, precio, stock } = req.body;
+app.post("/producto", async (req, res) => {
+    try {
+        const { nombre, precio, stock, imagenBase64, imagen_url } = req.body;
+        let urlImgenFinal = imagen_url || null;
 
-    if (!nombre || precio === undefined || stock === undefined) {
-        return res.status(400).json({
-            mensaje: "Debes completar todos los campos"
-        });
-    }
+        // Si se selecciona una imagen, la subimos a Cloudinary
+        if (imagenBase64) {
+            urlImgenFinal = await subirImgenCloudinary(imagenBase64);
+        }
 
-    const sql = `
-        INSERT INTO producto (nombre, precio, stock)
-        VALUES (?, ?, ?)
-    `;
-
-    const valores = [nombre, precio, stock];
-
-    conexion.query(sql, valores, (error, resultado) => {
-        if (error) {
-            console.error("Error al registrar producto:", error);
-            return res.status(500).json({
-                mensaje: "Error al registrar el producto"
+        if (!nombre || precio === undefined || stock === undefined) {
+            return res.status(400).json({
+                mensaje: "Debes completar todos los campos"
             });
         }
 
-        res.status(201).json({
-            mensaje: "Producto registrado correctamente",
-            id_producto: resultado.insertId
+        const sql = `
+            INSERT INTO producto (nombre, precio, stock, imagen_url)
+            VALUES (?, ?, ?, ?)
+        `;
+
+        const valores = [nombre, precio, stock, urlImgenFinal];
+
+        conexion.query(sql, valores, (error, resultado) => {
+            if (error) {
+                console.error("Error al registrar producto:", error);
+                return res.status(500).json({
+                    mensaje: "Error al registrar el producto"
+                });
+            }
+
+            res.status(201).json({
+                mensaje: "Producto registrado correctamente",
+                id_producto: resultado.insertId
+            });
         });
-    });
+
+    } catch (error) {
+        console.error("Error al subir imagen o crear producto:", error.message);
+
+        res.status(500).json({
+            mensaje: error.message || "Error al subir la imagen a Cloudinary"
+        });
+    }
 });
 
 // PUT: Actualizar un producto por su ID
-app.put("/producto/:id", (req, res) => {
-    const id = req.params.id;
-    const { nombre, precio, stock } = req.body;
+app.put("/producto/:id", async (req, res) => {
+    try {
+        const id = req.params.id;
+        const { nombre, precio, stock, imagenBase64, imagen_url } = req.body;
+        let urlImgenFinal = imagen_url || null;
 
-    if (!nombre || precio === undefined || stock === undefined) {
-        return res.status(400).json({
-            mensaje: "Debes completar todos los campos"
+        // Si se selecciona una nueva imagen, se sube a Cloudinary
+        if (imagenBase64) {
+            urlImgenFinal = await subirImgenCloudinary(imagenBase64);
+        }
+
+        if (!nombre || precio === undefined || stock === undefined) {
+            return res.status(400).json({
+                mensaje: "Debes completar todos los campos"
+            });
+        }
+
+        const sql = `
+            UPDATE producto
+            SET nombre = ?, precio = ?, stock = ?,
+                imagen_url = COALESCE(?, imagen_url)
+            WHERE id_producto = ?
+        `;
+
+        const valores = [nombre, precio, stock, urlImgenFinal, id];
+
+        conexion.query(sql, valores, (error, resultado) => {
+            if (error) {
+                console.error("Error al actualizar:", error);
+                return res.status(500).json({
+                    mensaje: "Error al actualizar el producto"
+                });
+            }
+
+            if (resultado.affectedRows === 0) {
+                return res.status(404).json({
+                    mensaje: "No se encontró el producto con ese ID"
+                });
+            }
+
+            res.json({
+                mensaje: "Producto actualizado correctamente",
+                imagen_url: urlImgenFinal
+            });
+        });
+
+    } catch (error) {
+        console.error("Error al actualizar producto o imagen:", error.message);
+
+        res.status(500).json({
+            mensaje: error.message || "Error al actualizar la imagen en Cloudinary"
         });
     }
-
-    const sql = `
-        UPDATE producto
-        SET nombre = ?, precio = ?, stock = ?
-        WHERE id_producto = ?
-    `;
-
-    const valores = [nombre, precio, stock, id];
-
-    conexion.query(sql, valores, (error, resultado) => {
-        if (error) {
-            console.error("Error al actualizar:", error);
-            return res.status(500).json({
-                mensaje: "Error al actualizar el producto"
-            });
-        }
-
-        if (resultado.affectedRows === 0) {
-            return res.status(404).json({
-                mensaje: "No se encontró el producto con ese ID"
-            });
-        }
-
-        res.json({
-            mensaje: "Producto actualizado correctamente"
-        });
-    });
 });
 
 // DELETE: Eliminar un producto por su ID
@@ -142,11 +216,12 @@ app.get("/mensajes_contacto", (req, res) => {
 });
 
 // POST: Registrar un mensaje
-
 app.post("/mensajes_contacto", (req, res) => {
     const { nombre, email, asunto, mensaje } = req.body;
 
-    if (![nombre, email, asunto, mensaje].every((valor) => typeof valor === "string" && valor.trim())) {
+    if (![nombre, email, asunto, mensaje].every(
+        (valor) => typeof valor === "string" && valor.trim()
+    )) {
         return res.status(400).json({
             mensaje: "Debes completar todos los campos"
         });
@@ -157,7 +232,12 @@ app.post("/mensajes_contacto", (req, res) => {
         VALUES (?, ?, ?, ?)
     `;
 
-    const valores = [nombre.trim(), email.trim(), asunto.trim(), mensaje.trim()];
+    const valores = [
+        nombre.trim(),
+        email.trim(),
+        asunto.trim(),
+        mensaje.trim()
+    ];
 
     conexion.query(sql, valores, (error, resultado) => {
         if (error) {
@@ -178,7 +258,9 @@ app.post("/mensajes_contacto", (req, res) => {
 app.put("/mensajes_contacto/:id", (req, res) => {
     const { nombre, email, asunto, mensaje } = req.body;
 
-    if (![nombre, email, asunto, mensaje].every((valor) => typeof valor === "string" && valor.trim())) {
+    if (![nombre, email, asunto, mensaje].every(
+        (valor) => typeof valor === "string" && valor.trim()
+    )) {
         return res.status(400).json({
             mensaje: "Debes completar todos los campos"
         });
@@ -189,7 +271,14 @@ app.put("/mensajes_contacto/:id", (req, res) => {
         SET nombre = ?, email = ?, asunto = ?, mensaje = ?
         WHERE id_mensaje = ?
     `;
-    const valores = [nombre.trim(), email.trim(), asunto.trim(), mensaje.trim(), req.params.id];
+
+    const valores = [
+        nombre.trim(),
+        email.trim(),
+        asunto.trim(),
+        mensaje.trim(),
+        req.params.id
+    ];
 
     conexion.query(sql, valores, (error, resultado) => {
         if (error) {
@@ -237,9 +326,20 @@ app.delete("/mensajes_contacto/:id", (req, res) => {
     });
 });
 
+// Iniciar servidor después de verificar la columna
+const PORT = process.env.PORT || 3000;
 
-// Iniciar servidor
-const PORT = process.env.PORT || 3000
-app.listen(PORT, () => {
-    console.log(`Servidor ejecutándose en http://localhost:${PORT}`);
-});
+async function iniciarServidor() {
+    try {
+        await verificarColumnaImagen();
+
+        app.listen(PORT, () => {
+            console.log(`Servidor ejecutándose en http://localhost:${PORT}`);
+        });
+
+    } catch (error) {
+        console.error("No se pudo iniciar el servidor:", error.message);
+    }
+}
+
+iniciarServidor();
